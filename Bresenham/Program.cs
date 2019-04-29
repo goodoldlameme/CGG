@@ -10,16 +10,15 @@ namespace Brezenham
 {
     public class MyForm : Form
     {
-        const double a = 20;
+        const double a = -1;
         const double b = 1;
-        const double c = -3;
+        const double c = 0;
         const double d = 0;
-        private const int step = 0;
         public IBresenhamDrawer DrawingAlgorithm;
         // рисуем на экране
         private void PutPixel(Graphics graphicsItem, int x, int y, Brush brush)
         {
-            graphicsItem.FillRectangle(brush, x, y, 1, 1);
+            graphicsItem.FillRectangle(brush, x, y, 1, 1);    
         }
         // рисуем матрицу
         private void DrawMatrix(Graphics graphicsItem, bool[,] matrix)
@@ -39,7 +38,7 @@ namespace Brezenham
             var graphicsItem = CreateGraphics();
             graphicsItem.Clear(Color.White);
             DrawAxis(graphicsItem);
-            var resultMatrix = DrawingAlgorithm.DrawLine(a, b, c, d, formHeight, formWidth);
+            var resultMatrix = DrawingAlgorithm.DrawLine(a, b, c, 0, formHeight, formWidth);
             DrawMatrix(graphicsItem, resultMatrix);
         }
 
@@ -50,24 +49,32 @@ namespace Brezenham
             var pixPerA = (int)Math.Floor((double)height / 2);
             var xStart = (int)Math.Round((double) width / 2);
             var pixPerUnit = a < 1 ? pixPerA : (int)Math.Floor(pixPerA / a);
-            graphics.DrawLine(Pens.Black, 0, pixPerA, width - 1, pixPerA);
+            var yOffset = pixPerA + (int) (d * pixPerUnit);
+            if (yOffset > 0 && yOffset < height)
+                graphics.DrawLine(Pens.Black, 0, yOffset, width - 1, yOffset);
             graphics.DrawLine(Pens.Black, xStart, 0, xStart, height - 1);
-            DrawNoches(graphics, pixPerA - 2, xStart - 2, pixPerUnit);
+            DrawNoches(graphics, yOffset - 2, xStart - 2, pixPerUnit);
         }
 
         private void DrawNoches(Graphics graphics, int yStart, int xStart, int unitStep)
         {
             var height = ClientSize.Height;
             var width = ClientSize.Width;
+            var pixPerA = (int)Math.Floor((double)height / 2);
+            
             for (var i = xStart + 2; i < width; i+=unitStep)
             {
+                graphics.DrawString($"{(i - xStart - 2) / unitStep}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, i, yStart);
                 graphics.DrawLine(Pens.Black, i, yStart, i, yStart + 4);   
+                graphics.DrawString($"{-(i - xStart - 2) / unitStep}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, width - i, yStart);
                 graphics.DrawLine(Pens.Black, width - i, yStart, width - i, yStart + 4);                      
             }
-            for (var i = yStart + 2; i < height; i+=unitStep)
+            
+            for (var i = 0; i < height; i+=unitStep)
             {
-                graphics.DrawLine(Pens.Black, xStart, i, xStart + 4, i);     
-                graphics.DrawLine(Pens.Black, xStart, height - i, xStart + 4, height - i);                      
+                if ((pixPerA - i) / unitStep + d != 0)
+                    graphics.DrawString($"{(pixPerA - i) / unitStep + d}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, xStart, i);
+                graphics.DrawLine(Pens.Black, xStart, i, xStart + 4, i);                    
             }
         }
 
