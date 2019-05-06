@@ -18,22 +18,42 @@ namespace Brezenham
             return matrix;
         }
 
-        private void DrawCosineLine(bool[,] resultMatrix, int yStart, double xEnd, double offset, int pixPerUnit, int pixPerA, int xStart, int direction, Func<double, double, double> metric)
+        private void DrawLeftPart(int[,] resultMatrix)
+        {
+            
+        }
+
+        private void DrawCosineLine(bool[,] resultMatrix, int yStart, double offset, int pixPerUnit, int pixPerA, int xStart, int direction, Func<double, double, double> metric)
         {
             var width = resultMatrix.GetLength(1);
             var height = resultMatrix.GetLength(0);
             var pixX = xStart;
-            var xPixEnd = xStart + pixPerUnit * xEnd;
+    //        var xPixEnd = xStart + pixPerUnit * xEnd;
+            var stepDirection = direction;
+            var yEnd = direction > 0 ? height - yStart + 1 : height - yStart - 2;
+            if (yEnd > height)
+                yEnd -= 1;
             
-            for (var pixY = yStart; pixY < height - yStart; pixY++)
+            for (var pixY = yStart; pixX < width; pixY+=stepDirection)
             {
-                while(pixX < 2*xPixEnd && pixX < width)
+                if (pixY == yEnd)
+                {
+                    stepDirection = -stepDirection;
+                    if (direction > 0)
+                        yEnd = stepDirection > 0 ? height - yStart + 1 : yStart - 1;
+                    else
+                        yEnd = stepDirection > 0 ? yStart : height - yStart - 2;
+                    if (yEnd > height)
+                        yEnd -= 1;
+                    continue;
+                }
+                while(/*pixX < 2*xPixEnd &&*/ pixX < width)
                 {  
                     resultMatrix[pixY, pixX] = true;
                     var x = (double)(pixX - xStart) / pixPerUnit - offset;
                     var nextX = (double)(pixX + 1 - xStart) / pixPerUnit - offset;
                     var y = (double)(pixPerA - pixY) / pixPerUnit;
-                    var nextY = (double)(pixPerA - pixY - 1) / pixPerUnit;
+                    var nextY = (double)(pixPerA - pixY - stepDirection) / pixPerUnit;
                     var diagonal = metric(nextX, nextY);
                     var horizontal = metric(nextX, y);
                     var vertical = metric(x, nextY);
@@ -51,13 +71,14 @@ namespace Brezenham
                     }
                 }
             }
+            
         }
 
         public bool[,] DrawLine(double a, double b, double c, double d, int height, int width)
         {
             var resultMatrix = GetEmptyMatrix(height, width);
             var pixPerA = (int)Math.Floor((double)height / 2);
-            var pixPerUnit = a < 1 ? pixPerA : (int)Math.Floor(pixPerA / a);
+            var pixPerUnit = Math.Abs(a) < 1 && Math.Abs(a) > 0 ? pixPerA : Math.Abs((int)Math.Truncate(pixPerA / a));
             var offset = c / b % (2 * Math.PI);
             var xMiddle = Math.Round((double) width / 2);
             var xEnd = Math.PI / (2 * Math.Abs(b));
@@ -73,15 +94,20 @@ namespace Brezenham
 
             Func<double, double, double> metric = (x, y) =>
             {
+                y = Math.Abs(y) > Math.Abs(a) ? Math.Sign(y) * Math.Abs(a) : y;
+                var offX = x + c / b;
+                var sign = offX % (2 * Math.PI / b) < Math.PI / b ? 1 : -1;
+                var n = Math.Round(offX*b/(2*Math.PI));
                 Func<double, double> func = u => a * Math.Cos(b * u + c) + d;
-                var bound = (Math.Sign(b)*Math.Acos((y - d) / a) - c) / b;
+                var bound = (sign * Math.Acos((y - d) / a) - c + 2*Math.PI*n) / b;
                 var minimaX = FindMinimum.OfScalarFunctionConstrained(
                     u => (u - x) * (u - x) + (func(u) - y) * (func(u) - y),
                     Math.Min(x, bound), Math.Max(x, bound));
                 return Math.Abs((minimaX - x) * (minimaX - x) + (func(minimaX) - y) * (func(minimaX) - y));
             };
 
-            DrawCosineLine(resultMatrix, a > 1 ? 0 : pixPerA - (int)(a * pixPerUnit), xEnd, offset, pixPerUnit, pixPerA, xStart, Math.Sign(a), metric);
+            var yStart = pixPerA - (int) (a * pixPerUnit);
+            DrawCosineLine(resultMatrix, yStart >= height ? yStart - 1 : yStart, offset, pixPerUnit, pixPerA, xStart, Math.Sign(a), metric);
             return resultMatrix;
         }
     }
