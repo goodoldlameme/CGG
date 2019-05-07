@@ -24,7 +24,7 @@ namespace Brezenham
             var height = resultMatrix.GetLength(0);
             var pixX = xStart;
             var stepDirection = direction;
-            var yEnd = direction > 0 ? height - yStart + 1 : height - yStart - 2;
+            var yEnd = direction > 0 ? height - yStart + 1 : height - yStart - 1;
             if (yEnd > height)
                 yEnd -= 1;
             for (var pixY = yStart; pixX > 0; pixY+=stepDirection)
@@ -35,7 +35,7 @@ namespace Brezenham
                     if (direction > 0)
                         yEnd = stepDirection > 0 ? height - yStart + 1 : yStart - 1;
                     else
-                        yEnd = stepDirection > 0 ? yStart + 1 : height - yStart - 2;
+                        yEnd = stepDirection > 0 ? yStart + 1 : height - yStart - 1;
                     if (yEnd > height)
                         yEnd -= 1;
                     continue;
@@ -73,7 +73,7 @@ namespace Brezenham
             var pixX = xStart;
     //        var xPixEnd = xStart + pixPerUnit * xEnd;
             var stepDirection = direction;
-            var yEnd = direction > 0 ? height - yStart + 1 : height - yStart - 2;
+            var yEnd = direction > 0 ? height - yStart + 1 : height - yStart - 1;
             if (yEnd > height)
                 yEnd -= 1;
             
@@ -85,7 +85,7 @@ namespace Brezenham
                     if (direction > 0)
                         yEnd = stepDirection > 0 ? height - yStart + 1 : yStart - 1;
                     else
-                        yEnd = stepDirection > 0 ? yStart + 1 : height - yStart - 2;
+                        yEnd = stepDirection > 0 ? yStart + 1 : height - yStart - 1;
                     if (yEnd > height)
                         yEnd -= 1;
                     continue;
@@ -120,11 +120,19 @@ namespace Brezenham
         public bool[,] DrawLine(double a, double b, double c, double d, int height, int width)
         {
             var resultMatrix = GetEmptyMatrix(height, width);
+            var offset = c / b % (2 * Math.PI);
             var pixPerA = (int)Math.Floor((double)height / 2);
             var pixPerUnit = Math.Abs(a) < 1 && Math.Abs(a) > 0 ? pixPerA : Math.Abs((int)Math.Truncate(pixPerA / a));
-            var offset = c / b % (2 * Math.PI);
             var xMiddle = Math.Round((double) width / 2);
             var xEnd = Math.PI / (2 * Math.Abs(b));
+            var yStart = pixPerA - (int) (a * pixPerUnit);
+            
+            if (Math.Abs(offset) > Math.Abs(a))
+            {
+                var pixPerOffset = (int)Math.Floor((double)height / 2);
+                pixPerUnit = Math.Abs((int) Math.Truncate(pixPerOffset / offset));
+                yStart = pixPerOffset - (int)a * pixPerUnit;
+            }
             var xStart = (int) (xMiddle - offset * pixPerUnit);
             if (xStart < 0)
             {
@@ -133,7 +141,6 @@ namespace Brezenham
             {
                 xStart -= (int)(2 * Math.PI/Math.Abs(b) * pixPerUnit);
             }
-            
 
             Func<double, double, double> metric = (x, y) =>
             {
@@ -163,7 +170,6 @@ namespace Brezenham
                 return Math.Abs((minimaX - x) * (minimaX - x) + (func(minimaX) - y) * (func(minimaX) - y));
             };
 
-            var yStart = pixPerA - (int) (a * pixPerUnit);
             DrawLeftCosineLine(resultMatrix, yStart >= height ? yStart - 1 : yStart, offset, pixPerUnit, pixPerA, xStart, Math.Sign(a), reversemetric);
             DrawCosineLine(resultMatrix, yStart >= height ? yStart - 1 : yStart, offset, pixPerUnit, pixPerA, xStart, Math.Sign(a), metric);
             return resultMatrix;

@@ -8,13 +8,11 @@ using Bresenham;
 
 namespace Brezenham
 {
-    //TODO крышечки на отрицательных
-    //TODO когда на маленьком рисунке из-за сдвига ничо не видно (c = 4, a = 1)
     public class MyForm : Form
     {
-        const double a = 20;
-        const double b = 1;
-        const double c = 0;    
+        private const double a = 0.1;
+        const double b = 0.2;
+        const double c = -10;    
         const double d = 0;
         public IBresenhamDrawer DrawingAlgorithm;
         // рисуем на экране
@@ -48,10 +46,17 @@ namespace Brezenham
         {
             var height = ClientSize.Height;
             var width = ClientSize.Width;
+            var offset = c / b % (2 * Math.PI);
             var pixPerA = (int)Math.Floor((double)height / 2);
             var xStart = (int)Math.Round((double) width / 2);
             var pixPerUnit = Math.Abs(a) < 1 && Math.Abs(a) > 0 ? pixPerA : Math.Abs((int)Math.Truncate(pixPerA / a));
             var yOffset = pixPerA + (int) (d * pixPerUnit);
+            if (Math.Abs(offset) > Math.Abs(a))
+            {
+                var pixPerOffset = (int)Math.Floor((double)height / 2);
+                pixPerUnit = Math.Abs((int) Math.Truncate(pixPerOffset / offset));
+                yOffset = pixPerOffset + (int)d * pixPerUnit;
+            }
             if (yOffset > 0 && yOffset < height)
                 graphics.DrawLine(Pens.Black, 0, yOffset, width - 1, yOffset);
             graphics.DrawLine(Pens.Black, xStart, 0, xStart, height - 1);
