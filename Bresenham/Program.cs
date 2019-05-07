@@ -9,13 +9,12 @@ using Bresenham;
 namespace Brezenham
 {
     //TODO крышечки на отрицательных
-    //TODO когда на маленьком рисунке из-за сдвига ничо не видно
-    //TODO вторую половину
+    //TODO когда на маленьком рисунке из-за сдвига ничо не видно (c = 4, a = 1)
     public class MyForm : Form
     {
         const double a = 20;
         const double b = 1;
-        const double c = 10;    
+        const double c = 0;    
         const double d = 0;
         public IBresenhamDrawer DrawingAlgorithm;
         // рисуем на экране
