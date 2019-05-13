@@ -146,10 +146,11 @@ namespace Brezenham
             {
                 y = Math.Abs(y) > Math.Abs(a) ? Math.Sign(y) * Math.Abs(a) : y;
                 var offX = x + offset;
+                var offC = offset != c / b ? offset : c;
                 var sign = offX % (2 * Math.PI / b) < Math.PI / b ? 1 : -1;
-                var n = Math.Round(offX*b/(2*Math.PI));
-                Func<double, double> func = u => a * Math.Cos(b * u + offset) + d;
-                var bound = (sign * Math.Acos((y - d) / a) - offset + 2*Math.PI*n) / b;
+                var n = Math.Round(offX * b / (2 * Math.PI));
+                Func<double, double> func = u => a * Math.Cos(b * u + offC) + d;
+                var bound = (sign * Math.Acos((y - d) / a) - offC  + 2*Math.PI*n) / b;
                 var minimaX = FindMinimum.OfScalarFunctionConstrained(
                     u => (u - x) * (u - x) + (func(u) - y) * (func(u) - y),
                     Math.Min(x, bound), Math.Max(x, bound));
@@ -160,10 +161,11 @@ namespace Brezenham
             {
                 y = Math.Abs(y) > Math.Abs(a) ? Math.Sign(y) * Math.Abs(a) : y;
                 var offX = x + offset;
+                var offC = offset != c / b ? offset : c;
                 var sign = Math.Abs(offX % (-2 * Math.PI / b)) < Math.PI / b ? -1 : 1;
                 var n = Math.Round(offX*b/(2*Math.PI));
-                Func<double, double> func = u => a * Math.Cos(b * u + offset) + d;
-                var bound = (sign * Math.Acos((y - d) / a) - offset + 2*Math.PI*n) / b;
+                Func<double, double> func = u => a * Math.Cos(b * u + offC) + d;
+                var bound = (sign * Math.Acos((y - d) / a) - offC + 2*Math.PI*n) / b;
                 var minimaX = FindMinimum.OfScalarFunctionConstrained(
                     u => (u - x) * (u - x) + (func(u) - y) * (func(u) - y),
                     Math.Min(x, bound), Math.Max(x, bound));

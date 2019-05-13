@@ -10,9 +10,9 @@ namespace Brezenham
 {
     public class MyForm : Form
     {
-        private const double a = 0.1;
-        const double b = 0.2;
-        const double c = -10;    
+        private const double a = 1;
+        const double b = 40;
+        const double c = 0;    
         const double d = 0;
         public IBresenhamDrawer DrawingAlgorithm;
         // рисуем на экране
