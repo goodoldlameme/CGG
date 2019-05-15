@@ -14,12 +14,13 @@ namespace FunctionGraph3D
         Func<double, double, double, double> XScreenCoordinate = (x, y, z) => (y - x) * Math.Sqrt(3) / 2;
         Func<double, double, double, double> YScreenCoordinate = (x, y, z) => (x + y) / 2 - z;
 
+        const double MinX = -1;
+        const double MaxX = 4; 
+        const double MinY = -5;
+        const double MaxY = 2;
+        
         //Func<double, double, double, double> XScreenCoordinate = (x, y, z) => -x / (2 * Math.Sqrt(2)) + y;
         //Func<double, double, double, double> YScreenCoordinate = (x, y, z) => x / (2 * Math.Sqrt(2)) - z;
-        const double MinX = -3;
-        const double MaxX = 3; 
-        const double MinY = -3;
-        const double MaxY = 3;
         public IGraphicsDrawer GraphicsDrawer;
         private void PutPixel(Graphics g, int x, int y, int col)
         {

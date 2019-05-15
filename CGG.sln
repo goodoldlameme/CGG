@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bresenham", "Bresenham\Bres
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphics3D", "Graphics3D\Graphics3D.csproj", "{CDE88851-1FD2-40C2-8303-8E84EDD311A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolygonIntersection", "PolygonIntersection\PolygonIntersection.csproj", "{E6B7D6C2-3667-4CB2-8769-2F22D26CB511}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{CDE88851-1FD2-40C2-8303-8E84EDD311A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDE88851-1FD2-40C2-8303-8E84EDD311A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDE88851-1FD2-40C2-8303-8E84EDD311A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6B7D6C2-3667-4CB2-8769-2F22D26CB511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6B7D6C2-3667-4CB2-8769-2F22D26CB511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6B7D6C2-3667-4CB2-8769-2F22D26CB511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6B7D6C2-3667-4CB2-8769-2F22D26CB511}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

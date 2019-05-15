@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Bresenham;
 
@@ -10,21 +7,23 @@ namespace Brezenham
 {
     public class MyForm : Form
     {
-        private const double a = 1;
-        const double b = 40;
+        const double a = -100;
+        const double b = 0.03;
         const double c = 0;    
-        const double d = 0;
-        public IBresenhamDrawer DrawingAlgorithm;
-        // рисуем на экране
+        const double d = 10;
+
+        private GraphicParams Params { get; set; }
+        private IBresenhamDrawer DrawingAlgorithm { get; set; }
+
         private void PutPixel(Graphics graphicsItem, int x, int y, Brush brush)
         {
             graphicsItem.FillRectangle(brush, x, y, 1, 1);    
         }
-        // рисуем матрицу
+
         private void DrawMatrix(Graphics graphicsItem, bool[,] matrix)
         {
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            for (int j = 0; j < matrix.GetLength(1); j++)
+            for (var i = 0; i < matrix.GetLength(0); i++)
+            for (var j = 0; j < matrix.GetLength(1); j++)
             {
                 if (matrix[i, j])
                     PutPixel(graphicsItem, j, i, Brushes.Red);
@@ -37,57 +36,50 @@ namespace Brezenham
             var formWidth = ClientSize.Width;
             var graphicsItem = CreateGraphics();
             graphicsItem.Clear(Color.White);
+            Params = new GraphicParams(a, b, c, d, formHeight, formWidth);
             DrawAxis(graphicsItem);
-            var resultMatrix = DrawingAlgorithm.DrawLine(a, b, c, 0, formHeight, formWidth);
-            DrawMatrix(graphicsItem, resultMatrix);
+            var resultMatrix = DrawingAlgorithm.DrawLine(Params);
+           DrawMatrix(graphicsItem, resultMatrix);
         }
 
         private void DrawAxis(Graphics graphics)
         {
-            var height = ClientSize.Height;
-            var width = ClientSize.Width;
-            var offset = c / b % (2 * Math.PI);
-            var pixPerA = (int)Math.Floor((double)height / 2);
-            var xStart = (int)Math.Round((double) width / 2);
-            var pixPerUnit = Math.Abs(a) < 1 && Math.Abs(a) > 0 ? pixPerA : Math.Abs((int)Math.Truncate(pixPerA / a));
-            var yOffset = pixPerA + (int) (d * pixPerUnit);
-            if (Math.Abs(offset) > Math.Abs(a))
-            {
-                var pixPerOffset = (int)Math.Floor((double)height / 2);
-                pixPerUnit = Math.Abs((int) Math.Truncate(pixPerOffset / offset));
-                yOffset = pixPerOffset + (int)d * pixPerUnit;
-            }
-            if (yOffset > 0 && yOffset < height)
-                graphics.DrawLine(Pens.Black, 0, yOffset, width - 1, yOffset);
-            graphics.DrawLine(Pens.Black, xStart, 0, xStart, height - 1);
-            DrawNoches(graphics, yOffset - 2, xStart - 2, pixPerUnit);
+            if (Params.YOffset > 0 && Params.YOffset < Params.Height)
+                graphics.DrawLine(Pens.Black, 0, Params.YOffset, Params.Width - 1, Params.YOffset);
+            graphics.DrawLine(Pens.Black, Params.XMiddle, 0, Params.XMiddle, Params.Height - 1);
+  //          DrawNoches(graphics);
         }
 
-        private void DrawNoches(Graphics graphics, int yStart, int xStart, int unitStep)
+        private void DrawNoches(Graphics graphics)
         {
-            var height = ClientSize.Height;
-            var width = ClientSize.Width;
-            var pixPerA = (int)Math.Floor((double)height / 2);
-            
-            for (var i = xStart + 2; i < width; i+=unitStep)
+            var yStart = Params.YOffset - 2;
+            var font = new Font(FontFamily.GenericSerif, 10f);
+            for (var i = Params.XMiddle; i < Params.Width; i+=Params.PixPerUnit)
             {
-                graphics.DrawString($"{(i - xStart - 2) / unitStep}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, i, yStart);
-                graphics.DrawLine(Pens.Black, i, yStart, i, yStart + 4);   
-                graphics.DrawString($"{-(i - xStart - 2) / unitStep}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, width - i, yStart);
-                graphics.DrawLine(Pens.Black, width - i, yStart, width - i, yStart + 4);                      
+                var value = (i - Params.XMiddle) / Params.PixPerUnit;
+                graphics.DrawString($"{value}", font, Brushes.Black, i, yStart);
+                graphics.DrawLine(Pens.Black, i, yStart, i, yStart + 4);
+                if (value != 0)
+                {
+                    graphics.DrawString($"{-value}", font, Brushes.Black, Params.Width - i, yStart);
+                    graphics.DrawLine(Pens.Black, Params.Width - i, yStart, Params.Width - i, yStart + 4);
+                }
             }
-            
-            for (var i = pixPerA + (int)d*unitStep; i < height; i+=unitStep)
+
+            var xStart = Params.XMiddle - 2;
+            for (var i = Params.YOffset; i < Params.Height; i+=Params.PixPerUnit)
             {
-                if ((pixPerA - i)  / unitStep + d != 0)
-                    graphics.DrawString($"{(pixPerA - i) / unitStep + d}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, xStart, i);
+                var value = (Params.PixPerYHalf - i) / Params.PixPerUnit + d;
+                if (value != 0)
+                    graphics.DrawString($"{value}", font, Brushes.Black, xStart, i);
                 graphics.DrawLine(Pens.Black, xStart, i, xStart + 4, i);                    
             }
             
-            for (var i = pixPerA + (int)d*unitStep; i > 0; i-=unitStep)
+            for (var i = Params.YOffset; i > 0; i-=Params.PixPerUnit)
             {
-                if ((pixPerA - i)  / unitStep + d != 0)
-                    graphics.DrawString($"{(pixPerA - i) / unitStep + d}", new Font(FontFamily.GenericSerif, 10f), Brushes.Black, xStart, i);
+                var value = (Params.PixPerYHalf - i) / Params.PixPerUnit + d;
+                if (value != 0)
+                    graphics.DrawString($"{value}", font, Brushes.Black, xStart, i);
                 graphics.DrawLine(Pens.Black, xStart, i, xStart + 4, i);                    
             }
         }

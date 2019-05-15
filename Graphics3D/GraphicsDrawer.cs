@@ -18,6 +18,7 @@ namespace FunctionGraph3D
                 Y = parameters.YScreenCoordinate(x, y, z);
             }
         }
+        
         private class PointInt
         {
             public int X, Y;
@@ -30,32 +31,38 @@ namespace FunctionGraph3D
             public PointInt(double x, double y, double z, Params parameters)
                 : this(new PointDouble(x, y, z, parameters)) { }
         }
+        
         private static void PutPixel(int[, ] matrix, int x, int y, int color)
         {
             matrix[y, x] = color;
         }
+        
         private static void PutPixel(int[, ] matrix, PointInt point, int color)
         {
             PutPixel(matrix, point.X, point.Y, color);
         }
+        
         private void PutPixel(int[, ] matrix, PointDouble point, int color)
         {
             PutPixel(matrix, new PointInt(point), color);
         }
-        private class ProectionBounds
+        
+        private class ProjectionBounds
         {
             public double MinX = double.PositiveInfinity;
             public double MaxX = double.NegativeInfinity;
             public double MinY = double.PositiveInfinity;
             public double MaxY = double.NegativeInfinity;
         }
+        
         private double GetValue(double minBound, double maxBound, int iteration, int partsCount)
         {
             return minBound + iteration * (maxBound - minBound) / partsCount;
         }
-        private ProectionBounds GetBounds(Params parameters, Func<int, int, double> GetX, Func<int, int, double> GetY)
+        
+        private ProjectionBounds GetBounds(Params parameters, Func<int, int, double> GetX, Func<int, int, double> GetY)
         {
-            var bounds = new ProectionBounds();
+            var bounds = new ProjectionBounds();
             for (var i = 0; i < parameters.n; i++)
             {
                 for (var j = 0; j < parameters.m; j++)
@@ -72,6 +79,7 @@ namespace FunctionGraph3D
             }
             return bounds;
         }
+        
         private void FillHorizonHeights(int[] topHorizonHeight, int[] bottomHorizonHeight, Params parameters)
         {
             for (var i = 0; i < parameters.Width; i++)
@@ -80,15 +88,18 @@ namespace FunctionGraph3D
                 bottomHorizonHeight[i] = 0;
             }
         }
+        
         private bool VisibleBottom(PointInt point, int[] bottomHorizonHeight)
         {
             return point.Y > bottomHorizonHeight[point.X];
         }
+        
         private bool VisibleTop(PointInt point, int[] topHorizonHeight)
         {
             return point.Y < topHorizonHeight[point.X];
         }
-        private List<PointInt> GetNewLine(int[, ] matrix, Params parameters, int iteration, ProectionBounds bounds, Func<int, int, double> GetX, Func<int, int, double> GetY)
+        
+        private List<PointInt> GetNewLine(int[, ] matrix, Params parameters, int iteration, ProjectionBounds bounds, Func<int, int, double> GetX, Func<int, int, double> GetY)
         {
             var result = new List<PointInt>();
             for (var i = 0; i < parameters.m; i++)
@@ -106,6 +117,7 @@ namespace FunctionGraph3D
             }
             return result;
         }
+        
         private class ColoredPoint : PointInt
         {
             public int Color;
@@ -116,6 +128,7 @@ namespace FunctionGraph3D
                 Color = color;
             }
         }
+        
         private IEnumerable<PointInt> DrawLineFromZero(PointInt target)
         {
             if (target.X == 0)
@@ -150,6 +163,7 @@ namespace FunctionGraph3D
                     };
             }
         }
+        
         private IEnumerable<ColoredPoint> BrezenhamLine(PointInt from, PointInt to, int color)
         {
             var x1 = to.X - from.X;
@@ -163,6 +177,7 @@ namespace FunctionGraph3D
                     new ColoredPoint(Math.Sign(x1) * point.X + from.X, Math.Sign(y1) * point.Y + from.Y, color))
                 .Skip(1);
         }
+        
         int AddPoint(List<ColoredPoint> result, PointInt point, int color, int prevColor)
         {
             if (prevColor != 0)
@@ -171,6 +186,7 @@ namespace FunctionGraph3D
                 result.Add(new ColoredPoint(point.X, point.Y, color));
             return color;
         }
+        
         private List<ColoredPoint> DrawContinuousLine(List<PointInt> sourcePoints, int[] topHorizonHeight, int[] bottomHorizonHeight)
         {
             var result = new List<ColoredPoint>();
@@ -192,14 +208,16 @@ namespace FunctionGraph3D
             }
             return result;
         }
+        
         private void DrawNextLayer(int[,] matrix, int[] topHorizonHeight, int[] bottomHorizonHeight, 
-            ProectionBounds bounds, Params parameters, Func<int, int, double> GetX, Func<int, int, double> GetY, int iteration)
+            ProjectionBounds bounds, Params parameters, Func<int, int, double> GetX, Func<int, int, double> GetY, int iteration)
         {
             var points = GetNewLine(matrix, parameters, iteration, bounds, GetX, GetY);
             var resultPoints = DrawContinuousLine(points, topHorizonHeight, bottomHorizonHeight);
             foreach (var point in resultPoints)
                 PutPixel(matrix, point, point.Color);
         }
+        
         private void DrawForDirection(int[, ] matrix, Params parameters, Func<int, int, double> GetX, Func<int, int, double> GetY, bool onlyFirstLine = false)
         {
             var topHorizonHeight = new int[parameters.Width];
@@ -213,6 +231,7 @@ namespace FunctionGraph3D
                     break;
             }
         }
+        
         private class Dot
         {
             public int Height, Color;
@@ -222,13 +241,16 @@ namespace FunctionGraph3D
                 Color = color;
             }
         }
-        static int[] dx = new [] { -1, -1, -1, 0, 0, 1, 1, 1 };
-        static int[] dy = new[] { -1, 0, 1, 1, -1, -1, 0, 1 };
+        
+        static int[] dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
+        static int[] dy = { -1, 0, 1, 1, -1, -1, 0, 1 };
+        
         private bool IsInside(int r, int c, int n, int m)
         {
             return 0 <= r && r < n && 0 <= c && c < m;
         }
-        void search(int[, ] matrix, int row, int col)
+        
+        private void Search(int[, ] matrix, int row, int col)
         {
             if (matrix[row, col] == 0)
                 return;
@@ -250,17 +272,19 @@ namespace FunctionGraph3D
                 var newRow = row + dx[d];
                 var newCol = col + dy[d];
                 if (IsInside(newRow, newCol, n, m) && matrix[newRow, newCol] == matrix[row, col])
-                    search(matrix, newRow, newCol);
+                    Search(matrix, newRow, newCol);
             }
         }
+        
         private void TwoNeighboursFilter(int[, ] matrix)
         {
             var n = matrix.GetLength(0);
             var m = matrix.GetLength(1);
             for (var i = 0; i < n; i++)
                 for (var j = 0; j < m; j++)
-                    search(matrix, i, j);
+                    Search(matrix, i, j);
         }
+        
         private void TryWindowFilter(int[, ] matrix, int row, int col, int windowSideLength)
         {
             var n = matrix.GetLength(0);
@@ -285,6 +309,7 @@ namespace FunctionGraph3D
             if (self <= sum - self)
                 matrix[row, col] = 0;
         }
+        
         private void WindowFilter(int[, ] matrix)
         {
             var n = matrix.GetLength(0);
@@ -294,6 +319,7 @@ namespace FunctionGraph3D
                     if (matrix[i, j] != 0)
                         TryWindowFilter(matrix, i, j, 23);
         }
+        
         private void FirstLineFilter(int[, ] matrix, Params parameters)
         {
             var n = matrix.GetLength(0);
@@ -330,6 +356,7 @@ namespace FunctionGraph3D
                     if (cleanupMatrix[i, j] != 0)
                         matrix[i, j] = cleanupMatrix[i, j];
         }
+        
         public void ContinuousFilter(int[, ] matrix)
         {
             var n = matrix.GetLength(0);
@@ -367,6 +394,7 @@ namespace FunctionGraph3D
                         matrix[i, j] = BottomColor;
                 }
         }
+        
         public void CutTrashDots(int[, ] matrix, Params parameters)
         {
             TwoNeighboursFilter(matrix);
@@ -374,6 +402,7 @@ namespace FunctionGraph3D
             FirstLineFilter(matrix, parameters);
             //ContinuousFilter(matrix);
         }
+        
         public int[,] DrawGraph(Params parameters)
         {
             var matrix = new int[parameters.Height, parameters.Width];

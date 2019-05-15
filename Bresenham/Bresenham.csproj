@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CosineDrawer.cs" />
+    <Compile Include="GraphicParams.cs" />
     <Compile Include="IBresenhamDrawer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
