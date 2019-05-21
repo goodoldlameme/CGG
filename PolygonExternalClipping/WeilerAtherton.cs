@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Numerics;
-using MathNet.Numerics.LinearAlgebra.Complex32;
-using MathNet.Numerics.Random;
 
 namespace PolygonExternalClipping
 {
@@ -143,8 +139,9 @@ namespace PolygonExternalClipping
                 {
                     var prev = IntersectionSubject.PreviousOrLast(cur).Value;
                     var next = IntersectionSubject.NextOrFirst(cur).Value;
-                    if ((IsInsideWindow(prev.point) || prev.intersectionStatus != IntersectionStatus.No) && 
-                        (!IsInsideWindow(next.point) || next.intersectionStatus != IntersectionStatus.No))
+                    var nextWindow = IsInside(next.point);
+                    var prevWindow = IsInside(prev.point);
+                    if (!nextWindow && prevWindow)
                         SubjectMove.AddLast((cur.Value.point, EnteringStatus.Out));
                     else
                         SubjectMove.AddLast((cur.Value.point, EnteringStatus.In));
@@ -194,7 +191,7 @@ namespace PolygonExternalClipping
                     var curInSub = FindNode(cur.Value.point, cur.Value.intersectionStatus);
                     var prev = IntersectionSubject.PreviousOrLast(curInSub).Value.point;
                     var next = IntersectionSubject.NextOrFirst(curInSub).Value.point;
-                    if (IsInsideWindow(prev) && !IsInsideWindow(next))
+                    if (IsInside(prev) && !IsInside(next))
                         ClipMove.AddFirst((cur.Value.point, EnteringStatus.Out));
                     else
                         ClipMove.AddFirst((cur.Value.point, EnteringStatus.In));
@@ -259,7 +256,7 @@ namespace PolygonExternalClipping
             {
                 if (cur.Value.intersectionStatus == IntersectionStatus.Yes &&
                     (Subject.Contains(cur.Value.point) || Clip.Contains(cur.Value.point)) && 
-                    IsInsideWindow(IntersectionSubject.PreviousOrLast(cur).Value.point) == IsInsideWindow(IntersectionSubject.NextOrFirst(cur).Value.point))
+                    IsInside(IntersectionSubject.PreviousOrLast(cur).Value.point) == IsInside(IntersectionSubject.NextOrFirst(cur).Value.point))
                     tempToDelete.Add(cur.Value);
                 cur = IntersectionSubject.NextOrFirst(cur);
             }
@@ -276,38 +273,23 @@ namespace PolygonExternalClipping
             }
         }
 
-        private bool IsInsideWindow(Vector2 point)
+        private bool IsInside(Vector2 point)
         {
-            var intersectionsNum = 0;
+            var flag = false;
             var prev = Clip.Last;
             var cur = Clip.First;
-            var prevUnder = prev.Value.Y < point.Y;
-
-            for (var i = 0; i < Clip.Count; ++i)
+            for (var i = 0; i < Clip.Count; i++)
             {
-                var curUnder = cur.Value.Y < point.Y;
-
-                var a = prev.Value - point;
-                var b = cur.Value - point;
-
-                var t = (a.X*(b.Y - a.Y) - a.Y*(b.X - a.X));
-                if (curUnder && !prevUnder)
-                {
-                    if (t > 0)
-                        intersectionsNum += 1;
-                }
-                if (!curUnder && prevUnder)
-                {
-                    if (t < 0)
-                        intersectionsNum += 1;
-                }
-
+                if ((cur.Value.Y <= point.Y && point.Y < prev.Value.Y ||
+                     prev.Value.Y <= point.Y && point.Y < cur.Value.Y) &&
+                    point.X > (prev.Value.X - cur.Value.X) * (point.Y - cur.Value.Y) / (prev.Value.Y - cur.Value.Y) +
+                    cur.Value.X)
+                    flag = !flag;
                 prev = cur;
                 cur = Clip.NextOrFirst(cur);
-                prevUnder = curUnder;        
             }
 
-            return (intersectionsNum&1) != 0;
+            return flag || IsOnWindow(point);
         }
 
         private bool IsIntersections(Vector2 insideA, Vector2 insideB, Vector2 outsideA, Vector2 outsideB)
@@ -315,7 +297,7 @@ namespace PolygonExternalClipping
             return IntersectionSubject
                 .Where(s => s.intersectionStatus == IntersectionStatus.Yes)
                 .Select(s => s.point)
-                .Any(elem => elem != insideA && elem != insideB && IsBelongsLine(outsideA, outsideB, elem));
+                .Any(elem =>IsBelongsLine(outsideA, outsideB, elem) && IsPointInside(outsideA, outsideB, elem));
         }
 
         private bool IsSpecialEdge(Vector2 clipA, Vector2 clipB, Vector2 subjectA, Vector2 subjectB)
@@ -325,16 +307,38 @@ namespace PolygonExternalClipping
             if (!clip.IsCollinear(subject) || !IsBelongsLine(clipA, clipB, subjectA)) return false;
             return IsEdgeInside(clipA, clipB, subjectA, subjectB);
         }
+        
+        private bool IsOnWindow(Vector2 point)
+        {
+            var cur = Clip.First;
+            for (var i = 0; i < Clip.Count; i++)
+            {
+                var prev = cur;
+                cur = Clip.NextOrFirst(cur);
+                if (IsBelongsLine(prev.Value, cur.Value, point) && IsPointInside(prev.Value, cur.Value, point))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsPointInside(Vector2 outsideA, Vector2 outsideB, Vector2 point)
+        {
+            return (outsideA.X < outsideB.X && point.X >= outsideA.X && point.X <= outsideB.X) || 
+                   (outsideB.X < outsideA.X && point.X >= outsideB.X && point.X <= outsideA.X) ||
+                   (Math.Abs(outsideA.X - outsideB.X) < 1e-5 && 
+                    (outsideA.Y < outsideB.Y && point.Y >= outsideA.Y && point.Y <= outsideB.Y) ||
+                    (outsideA.Y > outsideB.Y && point.Y <= outsideA.Y && point.Y >= outsideB.Y));   
+        }
 
         private bool IsBelongsLine(Vector2 point1, Vector2 point2, Vector2 pointToCheck) =>
-            (point1.Y - point2.Y) * pointToCheck.X + (point2.X - point1.X) * pointToCheck.Y == point2.X * point1.Y - point1.X * point2.Y ;
+            Math.Abs((point1.Y - point2.Y) * pointToCheck.X + (point2.X - point1.X) * pointToCheck.Y - (point2.X * point1.Y - point1.X * point2.Y)) < 1e-5 ;
         
 
         private bool IsEdgeInside(Vector2 insideA, Vector2 insideB, Vector2 outsideA, Vector2 outsideB)
         {
             return (outsideA.X < outsideB.X && insideA.X >= outsideA.X && insideA.X <= outsideB.X && insideB.X >= outsideA.X && insideB.X <= outsideB.X) || 
                    (outsideB.X < outsideA.X && insideA.X >= outsideB.X && insideA.X <= outsideA.X && insideB.X >= outsideB.X && insideB.X <= outsideA.X) ||
-                   (outsideA.X == outsideB.X && 
+                   (Math.Abs(outsideA.X - outsideB.X) < 1e-5 && 
                         (outsideA.Y < outsideB.Y && insideA.Y >= outsideA.Y && insideA.Y <= outsideB.Y && insideB.Y >= outsideA.Y && insideB.Y <= outsideB.Y) ||
                         (outsideA.Y > outsideB.Y && insideA.Y <= outsideA.Y && insideA.Y >= outsideB.Y && insideB.Y <= outsideA.Y && insideB.Y >= outsideB.Y));
         }

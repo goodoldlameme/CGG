@@ -23,6 +23,87 @@ namespace PolygonExternalClipping
         public MyForm()
         {
             
+//            subject.AddLast(new Vector2(0, 0));
+//            subject.AddLast(new Vector2(0, 4));
+//            subject.AddLast(new Vector2(4, 4));
+//            subject.AddLast(new Vector2(4, 0));
+//            clip.AddLast(new Vector2(4, 1));
+//            clip.AddLast(new Vector2(4, 2));
+//            clip.AddLast(new Vector2(6, 2));
+//            clip.AddLast(new Vector2(6, 1));
+            
+//            clip.AddLast(new Vector2(0, 0));
+//            clip.AddLast(new Vector2(0, 4));
+//            clip.AddLast(new Vector2(4, 4));
+//            clip.AddLast(new Vector2(4, 0));
+//            subject.AddLast(new Vector2(4, 1));
+//            subject.AddLast(new Vector2(4, 2));
+//            subject.AddLast(new Vector2(6, 2));
+//            subject.AddLast(new Vector2(6, 1));
+            
+            subject.AddLast(new Vector2(1, 0));
+            subject.AddLast(new Vector2(1, 4));
+            subject.AddLast(new Vector2(5, 4));
+            subject.AddLast(new Vector2(5, 0));
+            clip.AddLast(new Vector2(5, 0));
+            clip.AddLast(new Vector2(2, 2));
+            clip.AddLast(new Vector2(5, 4));
+            clip.AddLast(new Vector2(7, 4));
+            clip.AddLast(new Vector2(7, 0));
+            
+//            clip.AddLast(new Vector2(1, 0));
+//            clip.AddLast(new Vector2(1, 4));
+//            clip.AddLast(new Vector2(5, 4));
+//            clip.AddLast(new Vector2(5, 0));
+//            subject.AddLast(new Vector2(5, 0));
+//            subject.AddLast(new Vector2(2, 2));
+//            subject.AddLast(new Vector2(5, 4));
+//            subject.AddLast(new Vector2(7, 4));
+//            subject.AddLast(new Vector2(7, 0));
+       
+//            subject.AddLast(new Vector2(2, 0));
+//            subject.AddLast(new Vector2(2, 2));
+//            subject.AddLast(new Vector2(7, 2));
+//            subject.AddLast(new Vector2(5, 0));
+//            clip.AddLast(new Vector2(1, 0));
+//            clip.AddLast(new Vector2(1, 4));
+//            clip.AddLast(new Vector2(5, 4));
+//            clip.AddLast(new Vector2(5, 0));
+            
+//            clip.AddLast(new Vector2(2, 0));
+//            clip.AddLast(new Vector2(2, 2));
+//            clip.AddLast(new Vector2(7, 2));
+//            clip.AddLast(new Vector2(5, 0));
+//            subject.AddLast(new Vector2(1, 0));
+//            subject.AddLast(new Vector2(1, 4));
+//            subject.AddLast(new Vector2(5, 4));
+//            subject.AddLast(new Vector2(5, 0));
+
+//            subject.AddLast(new Vector2(1, 0));
+//            subject.AddLast(new Vector2(1, 4));
+//            subject.AddLast(new Vector2(5, 4));
+//            clip.AddLast(new Vector2(0, 1));
+//            clip.AddLast(new Vector2(3, 5));
+//            clip.AddLast(new Vector2(4, 1));
+            
+//            subject.AddLast(new Vector2(2, 0));
+//            subject.AddLast(new Vector2(1, 3));
+//            subject.AddLast(new Vector2(5, 5));
+//            subject.AddLast(new Vector2(5, 0));
+//            clip.AddLast(new Vector2(2, 2));
+//            clip.AddLast(new Vector2(2, 4));
+//            clip.AddLast(new Vector2(4, 6));
+//            clip.AddLast(new Vector2(4, 2));
+            
+//            clip.AddLast(new Vector2(2, 0));
+//            clip.AddLast(new Vector2(2, 4));
+//            clip.AddLast(new Vector2(5, 5));
+//            clip.AddLast(new Vector2(5, 0));
+//            subject.AddLast(new Vector2(1, 2));
+//            subject.AddLast(new Vector2(2, 4));
+//            subject.AddLast(new Vector2(4, 6));
+//            subject.AddLast(new Vector2(4, 2));
+            
 //            subject.AddLast(new Vector2(0, 1));
 //            subject.AddLast(new Vector2(1, 4));
 //            subject.AddLast(new Vector2(5, 4));
@@ -62,6 +143,15 @@ namespace PolygonExternalClipping
 //            clip.AddLast(new Vector2(5, 2));
 //            clip.AddLast(new Vector2(5, 1));
             
+//            clip.AddLast(new Vector2(1, 1));
+//            clip.AddLast(new Vector2(1, 5));
+//            clip.AddLast(new Vector2(5, 5));
+//            clip.AddLast(new Vector2(5, 1));
+//            subject.AddLast(new Vector2(2, 1));
+//            subject.AddLast(new Vector2(2, 2));
+//            subject.AddLast(new Vector2(5, 2));
+//            subject.AddLast(new Vector2(5, 1));
+            
 //            subject.AddLast(new Vector2(1, 1));
 //            subject.AddLast(new Vector2(2, 4));
 //            subject.AddLast(new Vector2(5, 5));
@@ -71,8 +161,7 @@ namespace PolygonExternalClipping
 //            clip.AddLast(new Vector2(1, 3));
 //            clip.AddLast(new Vector2(7, 4));
 //            clip.AddLast(new Vector2(5, 1));
-            
-            
+           
 //            clip.AddLast(new Vector2(2, 3));
 //            clip.AddLast(new Vector2(2, 5));
 //            clip.AddLast(new Vector2(5, 5));
@@ -89,38 +178,23 @@ namespace PolygonExternalClipping
 
         }
         
-        private bool IsInsideWindow(Vector2 point, CircularLinkedList<Vector2> list)
+        private bool IsInside(Vector2 point, CircularLinkedList<Vector2> list)
         {
-            var intersectionsNum = 0;
+            var flag = false;
             var prev = list.Last;
             var cur = list.First;
-            var prevUnder = prev.Value.Y < point.Y;
-
-            for (var i = 0; i < list.Count; ++i)
+            for (var i = 0; i < list.Count; i++)
             {
-                var curUnder = cur.Value.Y < point.Y;
-
-                var a = prev.Value - point;
-                var b = cur.Value - point;
-
-                var t = (a.X*(b.Y - a.Y) - a.Y*(b.X - a.X));
-                if (curUnder && !prevUnder)
-                {
-                    if (t > 0)
-                        intersectionsNum += 1;
-                }
-                if (!curUnder && prevUnder)
-                {
-                    if (t < 0)
-                        intersectionsNum += 1;
-                }
-
+                if ((cur.Value.Y <= point.Y && point.Y < prev.Value.Y ||
+                     prev.Value.Y <= point.Y && point.Y < cur.Value.Y) &&
+                    point.X > (prev.Value.X - cur.Value.X) * (point.Y - cur.Value.Y) / (prev.Value.Y - cur.Value.Y) +
+                    cur.Value.X)
+                    flag = !flag;
                 prev = cur;
                 cur = list.NextOrFirst(cur);
-                prevUnder = curUnder;        
             }
 
-            return (intersectionsNum&1) != 0;
+            return flag;
         }
         
         private bool IsBelongsLine(Vector2 point1, Vector2 point2, Vector2 pointToCheck) =>
@@ -134,12 +208,21 @@ namespace PolygonExternalClipping
             {
                 var prev = cur;
                 cur = list.NextOrFirst(cur);
-                if (IsBelongsLine(prev.Value, cur.Value, point))
+                if (IsBelongsLine(prev.Value, cur.Value, point) && IsPointInside(prev.Value, cur.Value, point))
                     return true;
             }
             return false;
         }
+        
 
+        private bool IsPointInside(Vector2 outsideA, Vector2 outsideB, Vector2 point)
+        {
+            return (outsideA.X < outsideB.X && point.X >= outsideA.X && point.X <= outsideB.X) || 
+                   (outsideB.X < outsideA.X && point.X >= outsideB.X && point.X <= outsideA.X) ||
+                   (Math.Abs(outsideA.X - outsideB.X) < 1e-5 && 
+                    (outsideA.Y < outsideB.Y && point.Y >= outsideA.Y && point.Y <= outsideB.Y) ||
+                    (outsideA.Y > outsideB.Y && point.Y <= outsideA.Y && point.Y >= outsideB.Y));   
+        }
 
         private void Draw(CircularLinkedList<Vector2> subject, CircularLinkedList<Vector2> clip)
         {
@@ -149,16 +232,16 @@ namespace PolygonExternalClipping
             var resultPolygons = ClippingAlgorithm.Process(subject, clip);
             if (resultPolygons.Count == 0)
             {
-                if (subject.Any(p => !IsInsideWindow(p, clip) && !IsOnWindow(clip, p))) 
+                if (subject.Any(p => !IsInside(p, clip) && !IsOnWindow(clip, p))) 
                 {
-                    if (clip.Any(p => !IsInsideWindow(p, subject) && !IsOnWindow(subject, p)))
+                    if (clip.Any(p => !IsInside(p, subject) && !IsOnWindow(subject, p)))
                     {
-                        graphics.FillPolygon(Brushes.Gold, GetPointArray(subject));
+                        graphics.FillPolygon(Brushes.PaleVioletRed, GetPointArray(subject));
                         graphics.DrawPolygon(Pens.Black, GetPointArray(subject));
                     }
                     else
                     {
-                        graphics.FillPolygon(Brushes.Gold, GetPointArray(subject));
+                        graphics.FillPolygon(Brushes.PaleVioletRed, GetPointArray(subject));
                         graphics.FillPolygon(Brushes.White, GetPointArray(clip));
                         graphics.DrawPolygon(Pens.Black, GetPointArray(subject));
                         graphics.DrawPolygon(Pens.Black, GetPointArray(clip));
@@ -169,9 +252,12 @@ namespace PolygonExternalClipping
 
             foreach (var polygon in resultPolygons)
             {
-                graphics.FillPolygon(Brushes.Gold, GetPointArray(polygon));
+                graphics.FillPolygon(Brushes.PaleVioletRed, GetPointArray(polygon));
                 graphics.DrawPolygon(Pens.Black, GetPointArray(polygon));
             }
+            
+            graphics.DrawPolygon(Pens.Black, GetPointArray(subject));
+            graphics.DrawPolygon(Pens.CornflowerBlue, GetPointArray(clip));
         }
 
         private PointF[] GetPointArray(CircularLinkedList<Vector2> list)
