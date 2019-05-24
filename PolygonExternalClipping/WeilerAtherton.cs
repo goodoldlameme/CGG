@@ -220,14 +220,14 @@ namespace PolygonExternalClipping
                     var prevClip = curClip.Value;
                     curClip = Clip.NextOrFirst(curClip);
                     if (IsSpecialEdge(prevClip, curClip.Value, prevSubj, curSubject.Value) && 
-                        !IsIntersections(prevClip, curClip.Value, prevSubj, curSubject.Value))
+                        !IsIntersections(prevSubj, curSubject.Value))
                     {
                         tempToDelete.Add((prevClip, IntersectionStatus.Yes));
                         tempToDelete.Add((curClip.Value, IntersectionStatus.Yes));
                     }
                     
                     if (IsSpecialEdge(prevSubj, curSubject.Value, prevClip, curClip.Value) && 
-                        !IsIntersections(prevSubj, curSubject.Value, prevClip, curClip.Value))
+                        !IsIntersections(prevClip, curClip.Value))
                     {
                         tempToDelete.Add((prevSubj, IntersectionStatus.Yes));
                         tempToDelete.Add((curSubject.Value, IntersectionStatus.Yes));
@@ -292,7 +292,7 @@ namespace PolygonExternalClipping
             return flag || IsOnWindow(point);
         }
 
-        private bool IsIntersections(Vector2 insideA, Vector2 insideB, Vector2 outsideA, Vector2 outsideB)
+        private bool IsIntersections(Vector2 outsideA, Vector2 outsideB)
         {
             return IntersectionSubject
                 .Where(s => s.intersectionStatus == IntersectionStatus.Yes)
