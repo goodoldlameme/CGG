@@ -32,6 +32,18 @@ namespace PolygonExternalClipping
 //            clip.AddLast(new Vector2(6, 2));
 //            clip.AddLast(new Vector2(6, 1));
             
+            subject.AddLast(new Vector2(0, 3));
+            subject.AddLast(new Vector2(0, 4));
+            subject.AddLast(new Vector2(3, 4));
+            subject.AddLast(new Vector2(3, 7));
+            subject.AddLast(new Vector2(4, 7));
+            subject.AddLast(new Vector2(4, 0));
+            subject.AddLast(new Vector2(3, 0));
+            subject.AddLast(new Vector2(3, 3));
+            clip.AddLast(new Vector2(1, 5));
+            clip.AddLast(new Vector2(4, 5));
+            clip.AddLast(new Vector2(4, 2));
+            
 //            clip.AddLast(new Vector2(0, 0));
 //            clip.AddLast(new Vector2(0, 4));
 //            clip.AddLast(new Vector2(4, 4));
@@ -41,15 +53,15 @@ namespace PolygonExternalClipping
 //            subject.AddLast(new Vector2(6, 2));
 //            subject.AddLast(new Vector2(6, 1));
             
-            subject.AddLast(new Vector2(1, 0));
-            subject.AddLast(new Vector2(1, 4));
-            subject.AddLast(new Vector2(5, 4));
-            subject.AddLast(new Vector2(5, 0));
-            clip.AddLast(new Vector2(5, 0));
-            clip.AddLast(new Vector2(2, 2));
-            clip.AddLast(new Vector2(5, 4));
-            clip.AddLast(new Vector2(7, 4));
-            clip.AddLast(new Vector2(7, 0));
+//            subject.AddLast(new Vector2(1, 0));
+//            subject.AddLast(new Vector2(1, 4));
+//            subject.AddLast(new Vector2(5, 4));
+//            subject.AddLast(new Vector2(5, 0));
+//            clip.AddLast(new Vector2(5, 0));
+//            clip.AddLast(new Vector2(2, 2));
+//            clip.AddLast(new Vector2(5, 4));
+//            clip.AddLast(new Vector2(7, 4));
+//            clip.AddLast(new Vector2(7, 0));
             
 //            clip.AddLast(new Vector2(1, 0));
 //            clip.AddLast(new Vector2(1, 4));
